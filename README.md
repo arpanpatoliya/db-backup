@@ -29,7 +29,7 @@ composer require arpanpatoliya/db-backup
 <p> After installation, publish the configuration file:
 
 ```bash
-php artisan vendor:publish --provider="ArpanPatoliya\DbBackup\DbBackupServiceProvider"
+php artisan vendor:publish --provider="Arpanpatoliya\DBBackup\DBBackupServiceProvider"
 
 ```
 
