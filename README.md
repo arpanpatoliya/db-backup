@@ -103,4 +103,4 @@ composer test
 - [Arpan Patoliya](https://github.com/arpanpatoliya) - Project creator and maintainer
 
 ## 📄 License
-MIT License. See [LICENSE](/vivek-mistry/repository-interface/blob/main/LICENSE) for details.
+MIT License. See [LICENSE](https://github.com/arpanpatoliya/db-backup/blob/main/LICENSE) for details.
