@@ -46,11 +46,41 @@ class GoogleDriveUploader implements UploaderInterface
                 'uploadType' => 'multipart',
             ]);
 
+            $this->cleanupOldFiles($service);
+            
             return true;
 
         } catch (\Exception $e) {
             Log::error("Google Drive upload failed: " . $e->getMessage());
             return false;
+        }
+    }
+
+    protected function cleanupOldFiles(Google_Service_Drive $service): void
+    {
+        try {
+            $files = $service->files->listFiles([
+                'q' => "'" . config('dbbackup.google_drive_folder') . "' in parents and trashed = false",
+                'fields' => 'files(id, name, createdTime)',
+                'orderBy' => 'createdTime desc',
+            ]);
+
+            $driveFiles = $files->getFiles();
+
+            if (count($driveFiles) > config('dbbackup.max_stored_backups')) {
+                $filesToDelete = array_slice($driveFiles, config('dbbackup.max_stored_backups'));
+
+                foreach ($filesToDelete as $file) {
+                    try {
+                        $service->files->delete($file->getId());
+                        Log::info("Deleted old file '{$file->getName()}' from Google Drive.");
+                    } catch (\Exception $e) {
+                        Log::error("Failed to delete file '{$file->getName()}': " . $e->getMessage());
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error during Google Drive cleanup: ' . $e->getMessage());
         }
     }
 
