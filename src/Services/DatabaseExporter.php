@@ -51,7 +51,7 @@ class DatabaseExporter implements ExporterInterface
     
             unlink($tempCnfPath);
         
-            if ($returnVar == 0) {
+            if ($returnVar !== 0) {
                 return json_encode([
                     'status' => false,
                     'message' => 'mysqldump failed: ' . implode("\n", $output)
