@@ -18,5 +18,5 @@ abstract class BackupManager
     }
 
     // Abstract method for child classes to implement
-    abstract public function run(): bool;
+    abstract public function run(): string;
 }

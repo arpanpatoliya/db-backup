@@ -17,7 +17,7 @@ class DatabaseExporter implements ExporterInterface
         $this->maxStoredBackups = config('dbbackup.max_stored_backups');
     }
 
-    public function export(): ?string
+    public function export(): string
     {
         try {
             $this->makeDir();
@@ -39,6 +39,7 @@ class DatabaseExporter implements ExporterInterface
             chmod($tempCnfPath, 0600);
         
 
+
             $command = sprintf(
                 'mysqldump --defaults-extra-file=%s --single-transaction --quick --lock-tables=false %s > %s 2>&1',
                 escapeshellarg($tempCnfPath),
@@ -46,27 +47,30 @@ class DatabaseExporter implements ExporterInterface
                 escapeshellarg($filePath)
             );
         
-            // dd($command);
             exec($command, $output, $returnVar);
-        
+    
             unlink($tempCnfPath);
         
-            if ($returnVar !== 0) {
-                throw new \RuntimeException('mysqldump failed: ' . implode("\n", $output));
+            if ($returnVar == 0) {
+                return json_encode([
+                    'status' => false,
+                    'message' => 'mysqldump failed: ' . implode("\n", $output)
+                ]);
             }
         
             $this->cleanupOldBackups();
         
-            return $filePath;
-        
-        } catch (\Throwable $e) {
-            // error reporting
-            Log::error('Database backup failed', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+            return json_encode([
+                'status' => true,
+                'message' => 'Database backup created successfully',
+                'file_path' => $filePath
             ]);
         
-            return null;
+        } catch (\Throwable $e) {
+            return json_encode([
+                'status' => false,
+                'message' => 'Database backup failed: ' . $e->getMessage()
+            ]);
         }
         
     }

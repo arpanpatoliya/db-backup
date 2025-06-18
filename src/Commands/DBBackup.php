@@ -36,7 +36,23 @@ class DBBackup extends Command
     public function handle()
     {
         $backup = new Backup();
-        $success = $backup->run();
+        $result = $backup->run();
+        $data = json_decode($result, true);
+        
+        if ($data['status']) {
+            $this->info('✅ ' . $data['message']);
+            if (isset($data['file_path'])) {
+                $this->line('📁 File: ' . $data['file_path']);
+            }
+            if (isset($data['upload_status'])) {
+                $this->line('☁️  ' . $data['upload_status']);
+            }
+        } else {
+            $this->error('❌ ' . $data['message']);
+            if (isset($data['upload_error'])) {
+                $this->error('☁️  Upload Error: ' . $data['upload_error']);
+            }
+        }
     }
 
 }

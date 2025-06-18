@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class GoogleDriveUploader implements UploaderInterface
 {
-    public function upload(string $filePath): bool
+    public function upload(string $filePath): string
     {
         try {
             $fileName = basename($filePath);
@@ -48,11 +48,16 @@ class GoogleDriveUploader implements UploaderInterface
 
             $this->cleanupOldFiles($service);
             
-            return true;
+            return json_encode([
+                'status' => true,
+                'message' => 'Backup uploaded to Google Drive successfully'
+            ]);
 
         } catch (\Exception $e) {
-            Log::error("Google Drive upload failed: " . $e->getMessage());
-            return false;
+            return json_encode([
+                'status' => false,
+                'message' => 'Google Drive upload failed: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -73,14 +78,13 @@ class GoogleDriveUploader implements UploaderInterface
                 foreach ($filesToDelete as $file) {
                     try {
                         $service->files->delete($file->getId());
-                        Log::info("Deleted old file '{$file->getName()}' from Google Drive.");
                     } catch (\Exception $e) {
-                        Log::error("Failed to delete file '{$file->getName()}': " . $e->getMessage());
+                        // Do nothing, just skip
                     }
                 }
             }
         } catch (\Exception $e) {
-            Log::error('Error during Google Drive cleanup: ' . $e->getMessage());
+            // Do nothing, just skip
         }
     }
 

@@ -4,6 +4,6 @@ namespace Arpanpatoliya\DBBackup\Contracts;
 
 interface UploaderInterface
 {
-    public function upload(string $filePath): bool;
+    public function upload(string $filePath): string;
 }
 
