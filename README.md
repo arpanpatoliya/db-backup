@@ -76,9 +76,8 @@ public function triggerBackupDirectly()
     $backup = new Backup();
     $success = $backup->run();
 
-    return $success
-        ? response()->json(['message' => 'Backup completed successfully.'])
-        : response()->json(['message' => 'Backup failed.'], 500);
+    $success = json_decode($success, true);
+    return response()->json($success);
 }
 
 ```
